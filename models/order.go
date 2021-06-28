@@ -1,9 +1,8 @@
 package models
 
 type Order struct {
-	ProductId []string `json:"productid"`
-	Quantity []int `json:"quantity"`
-	Customer *User `json:"customer"`
+	OrderId   int    `json:"order_id"`
+	UserEmail string `json:"email"`
+	Address   string `json:"address"`
+	Status    string `json:"status"`
 }
-
-// 1 -> 2 2 -> 4 === [1, 2] === [2, 4] (Club Id and Quantity)
