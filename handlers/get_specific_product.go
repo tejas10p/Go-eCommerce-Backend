@@ -2,22 +2,21 @@ package handlers
 
 import (
 	"eCommerce/database"
-	"eCommerce/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
+	"strconv"
 )
 
 func GetProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
-		for _, v := range database.Products {
-			if v.ID == params["id"] {
-				json.NewEncoder(w).Encode(v)
-				return
-			}
+		ID, err := strconv.Atoi(params["id"])
+		if err != nil {
+			log.Fatalf("Invalid ID - %s", err.Error())
 		}
-		json.NewEncoder(w).Encode(models.Product{})
+		json.NewEncoder(w).Encode(database.GetSpecificProduct(ID))
 	}
 }

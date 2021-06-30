@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func DeleteProduct() http.HandlerFunc {
+func BuyOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
@@ -17,6 +17,6 @@ func DeleteProduct() http.HandlerFunc {
 		if err != nil {
 			log.Fatalf("Invalid ID - %s", err.Error())
 		}
-		json.NewEncoder(w).Encode(database.DeleteProduct(ID))
+		json.NewEncoder(w).Encode(database.BuyOrder(ID))
 	}
 }

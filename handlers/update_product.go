@@ -5,23 +5,21 @@ import (
 	"eCommerce/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
+	"strconv"
 )
 
 func UpdateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
-		for i, v := range database.Products {
-			if v.ID == params["id"] {
-				database.Products = append(database.Products[:i], database.Products[i+1:]...)
-				break
-			}
+		ID, err := strconv.Atoi(params["id"])
+		if err != nil {
+			log.Fatalf("Invalid ID - %s", err.Error())
 		}
 		var newProduct models.Product
 		_ = json.NewDecoder(r.Body).Decode(&newProduct)
-		newProduct.ID = params["id"]
-		database.Products = append(database.Products, newProduct)
-		json.NewEncoder(w).Encode(newProduct)
+		json.NewEncoder(w).Encode(database.UpdateProduct(ID, newProduct))
 	}
 }

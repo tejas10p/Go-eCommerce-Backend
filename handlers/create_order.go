@@ -7,11 +7,11 @@ import (
 	"net/http"
 )
 
-func AddUser() http.HandlerFunc {
+func CreateOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		var newUser models.User
-		_ = json.NewDecoder(r.Body).Decode(&newUser)
-		json.NewEncoder(w).Encode(database.AddUser(newUser))
+		var newOrder models.Order
+		_ = json.NewDecoder(r.Body).Decode(&newOrder)
+		json.NewEncoder(w).Encode(database.AddOrder(newOrder))
 	}
 }
