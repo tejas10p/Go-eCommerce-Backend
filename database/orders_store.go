@@ -3,12 +3,13 @@ package database
 import (
 	"database/sql"
 	"eCommerce/models"
+	"errors"
 	"log"
 )
 
 func AddOrder(order models.Order) models.Order {
 	order.Status = "Created"
-	_, err := Db.Exec("INSERT INTO user VALUES (0, ?, ?, ?, ?)", order.UserEmail, order.Address, order.Status)
+	_, err := Db.Exec("INSERT INTO orders (email, address, status) VALUES (?, ?, ?, ?)", order.UserEmail, order.Address, order.Status)
 	if err != nil {
 		log.Fatalf("Cannot add order - %s", err.Error())
 	}
@@ -21,28 +22,28 @@ func AddOrder(order models.Order) models.Order {
 	return order
 }
 
-func BuyOrder(id int) int {
+func BuyOrder(id int) (int, error) {
 	result, err := Db.Query("SELECT * FROM item WHERE orderid = ?", id)
 	if err != nil {
-		log.Fatalf("Cannot retrieve order - %s", err.Error())
+		return 0, errors.New("order retrieval fail")
 	}
 	if checkStatus(id, "Created") {
-		log.Fatalf("Trying to purchsae an already purchased or returned order")
+		return 0, errors.New("status check fail")
 	}
 	totalAmount := 0
 	for result.Next() {
 		var currentItem models.Item
 		err = result.Scan(&currentItem.OrderId, &currentItem.ProductId, &currentItem.Quantity, &currentItem.Amount)
 		if err != nil {
-			log.Fatalf("Error while scanning data rows - %s", err.Error())
+			return 0, errors.New("row scan fail")
 		}
 		totalAmount += currentItem.Amount
 	}
 	_, err = Db.Exec("UPDATE orders SET status = ? WHERE id = ?", "Purchased", id)
 	if err != nil {
-		log.Fatalf("Could not update order status - %s", err.Error())
+		return 0, errors.New("status update fail")
 	}
-	return totalAmount
+	return totalAmount, nil
 }
 
 func ReturnOrder(id int) int {

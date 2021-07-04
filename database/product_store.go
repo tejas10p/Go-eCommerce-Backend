@@ -58,12 +58,12 @@ func DeleteProduct(id int) models.Product {
 }
 
 func AddProduct(product models.Product) models.Product {
-	_, err := Db.Exec("INSERT INTO product VALUES (0, ?, ?, ?)", product.Name, product.Price, product.Category)
+	_, err := Db.Exec("INSERT INTO product (name, price, category) VALUES (?, ?, ?)", product.Name, product.Price, product.Category)
 	if err != nil {
 		log.Fatalf("Cannot add product - %s", err.Error())
 	}
 	var result *sql.Rows
-	result, err = Db.Query("SELECT last_insert_id()")
+	result, err = Db.Query("SELECT MAX(id) FROM product")
 	if err != nil {
 		log.Fatalf("Error retrieving ID for product - %s", err.Error())
 	}

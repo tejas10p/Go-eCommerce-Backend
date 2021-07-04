@@ -6,6 +6,11 @@ import (
 )
 
 func checkStatus(id int, requiredStatus string) bool {
+	_, err = Db.Exec("USE eCommerce")
+	if err != nil {
+		log.Fatalf("Error selcting database - %s", err.Error())
+	}
+
 	result, err := Db.Query("SELECT status FROM orders WHERE id = ?", id)
 	if err != nil {
 		log.Fatalf("Could not get order status - %s", err.Error())

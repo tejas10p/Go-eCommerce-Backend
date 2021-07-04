@@ -17,6 +17,26 @@ func BuyOrder() http.HandlerFunc {
 		if err != nil {
 			log.Fatalf("Invalid ID - %s", err.Error())
 		}
-		json.NewEncoder(w).Encode(database.BuyOrder(ID))
+		result, err := database.BuyOrder(ID)
+		if err != nil {
+			if err.Error() == "order retrieval fail" {
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Println("Cannot retrieve order")
+			} else if err.Error() == "status check fail" {
+				w.WriteHeader(http.StatusBadRequest)
+				log.Println("Trying to purchase an already purchased or returned order")
+			} else if err.Error() == "row scan fail" {
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Println("Error while scanning data rows")
+			} else {
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Println("Could not update order status")
+			}
+			return
+		}
+		w.WriteHeader(http.StatusAccepted)
+		json.NewEncoder(w).Encode(result)
 	}
 }
+
+// Handle 4xx Context
