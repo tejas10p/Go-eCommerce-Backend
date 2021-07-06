@@ -3,6 +3,7 @@ package handlers
 import (
 	"database/sql"
 	"eCommerce/database"
+	"eCommerce/kafka"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
@@ -23,6 +24,7 @@ func (suite *CreateBuyOrderTest) SetupSuite() {
 	database.Init()
 	suite.dbx = database.Db
 	SetDummyEntries(suite.dbx)
+	kafka.CreateTopic("producers", 1)
 }
 
 func (suite *CreateBuyOrderTest) TearDownSuite() {
