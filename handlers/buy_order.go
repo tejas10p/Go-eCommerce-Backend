@@ -1,23 +1,19 @@
 package handlers
 
 import (
-	"eCommerce/database"
+	"eCommerce/workers"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 func BuyOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		params := mux.Vars(r)
-		ID, err := strconv.Atoi(params["id"])
-		if err != nil {
-			log.Fatalf("Invalid ID - %s", err.Error())
-		}
-		result, err := database.BuyOrder(ID)
+		ID := params["id"]
+		result, err := workers.InitiatePurchase(ID)
 		if err != nil {
 			if err.Error() == "order retrieval fail" {
 				w.WriteHeader(http.StatusInternalServerError)

@@ -2,9 +2,11 @@ package database
 
 import (
 	"database/sql"
+	"eCommerce/kafka"
 	"eCommerce/models"
 	"errors"
 	"log"
+	"strconv"
 )
 
 func AddOrder(order models.Order) models.Order {
@@ -22,7 +24,14 @@ func AddOrder(order models.Order) models.Order {
 	return order
 }
 
-func BuyOrder(id int) (int, error) {
+func BuyOrder() (int, error) {
+	c := kafka.NewConsumer("orders")
+	kafkaResult := kafka.ConsumeMessage(c, "purchases")
+	kafka.CloseConsumer(c)
+	id, err := strconv.Atoi(kafkaResult)
+	if err != nil {
+		return 0, errors.New("order retrieval fail")
+	}
 	result, err := Db.Query("SELECT * FROM item WHERE orderid = ?", id)
 	if err != nil {
 		return 0, errors.New("order retrieval fail")
